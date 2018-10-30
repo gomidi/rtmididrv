@@ -5,8 +5,8 @@ import (
 	"math"
 	"sync"
 
-	"github.com/gomidi/connect"
-	"github.com/gomidi/rtmididrv/imported/rtmidi"
+	"gitlab.com/gomidi/midi/mid"
+	"gitlab.com/gomidi/rtmididrv/imported/rtmidi"
 	//	"github.com/metakeule/mutex"
 )
 
@@ -104,7 +104,7 @@ func (i *in) Open() (err error) {
 	return nil
 }
 
-func newIn(debug bool, driver *driver, number int, name string) connect.In {
+func newIn(debug bool, driver *driver, number int, name string) mid.In {
 	i := &in{driver: driver, number: number, name: name}
 	//	i.RWMutex = mutex.NewRWMutex("rtmididrv in port "+name, debug)
 	return i
@@ -115,7 +115,7 @@ func (i *in) SetListener(listener func(data []byte, deltaMicroseconds int64)) (e
 	i.RLock()
 	if i.closed || i.midiIn == nil {
 		i.RUnlock()
-		return connect.ErrClosed
+		return mid.ErrClosed
 	}
 
 	if i.listenerSet {
@@ -147,7 +147,7 @@ func (i *in) StopListening() error {
 	i.RLock()
 	if i.closed || i.midiIn == nil {
 		i.RUnlock()
-		return connect.ErrClosed
+		return mid.ErrClosed
 	}
 	i.RUnlock()
 	i.Lock()

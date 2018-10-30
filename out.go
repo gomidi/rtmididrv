@@ -5,12 +5,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gomidi/connect"
-	"github.com/gomidi/rtmididrv/imported/rtmidi"
+	"gitlab.com/gomidi/midi/mid"
+	"gitlab.com/gomidi/rtmididrv/imported/rtmidi"
 	//	"github.com/metakeule/mutex"
 )
 
-func newOut(debug bool, driver *driver, number int, name string) connect.Out {
+func newOut(debug bool, driver *driver, number int, name string) mid.Out {
 	o := &out{driver: driver, number: number, name: name}
 	//	o.RWMutex = mutex.NewRWMutex("rtmididrv out port "+name, debug)
 	return o
@@ -35,14 +35,14 @@ func (o *out) IsOpen() (open bool) {
 }
 
 // Send sends a message to the MIDI out port
-// If the out port is closed, it returns connect.ErrClosed
+// If the out port is closed, it returns mid.ErrClosed
 func (o *out) Send(b []byte) error {
 	//o.RLock()
 	o.Lock()
 	defer o.Unlock()
 	if o.closed || o.midiOut == nil {
 		//o.RUnlock()
-		return connect.ErrClosed
+		return mid.ErrClosed
 	}
 	//	o.RUnlock()
 

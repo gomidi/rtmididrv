@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 /*
-Package rtmididrv provides a gomidi/connect/Driver to connect gomidi/mid with external MIDI ports via rtmidi.
+Package rtmididrv provides a gomidi/midi/mid.Driver to connect to external MIDI ports via rtmidi.
 See the example to get an idea how to use it.
 
 */

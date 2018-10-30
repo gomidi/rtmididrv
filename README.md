@@ -4,10 +4,10 @@
 
 ## Purpose
 
-A driver for the unified MIDI driver interface at https://github.com/gomidi/connect .
+A driver for the unified MIDI driver interface https://gitlab.com/gomidi/midi/mid.Driver .
 
 This driver is based on the rtmidi project (see https://github.com/thestk/rtmidi for more information).
-For a driver based on portmidi, see https://github.com/gomidi/portmididrv
+For a driver based on portmidi, see https://gitlab.com/gomidi/portmididrv
 
 ## Installation
 
@@ -17,12 +17,12 @@ It is recommended to use Go 1.11 with module support (`$GO111MODULE=on`).
 
 ```
 // install the headers of alsa somehow, e.g. sudo apt-get install libasound2-dev
-go get -d github.com/gomidi/rtmididrv
+go get -d gitlab.com/gomidi/rtmididrv
 ```
 
 ## Documentation
 
-[![rtmididrv docs](http://godoc.org/github.com/gomidi/rtmididrv?status.png)](http://godoc.org/github.com/gomidi/rtmididrv)
+[![rtmididrv docs](http://godoc.org/gitlab.com/gomidi/rtmididrv?status.png)](http://godoc.org/gitlab.com/gomidi/rtmididrv)
 
 
 ## Example
@@ -35,9 +35,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/gomidi/connect"
-	"github.com/gomidi/mid"
-	driver "github.com/gomidi/rtmididrv"
+	"gitlab.com/gomidi/midi/mid"
+	driver "gitlab.com/gomidi/rtmididrv"
 )
 
 func must(err error) {
@@ -96,11 +95,11 @@ func main() {
 	}
 }
 
-func printPort(port connect.Port) {
+func printPort(port mid.Port) {
 	fmt.Printf("[%v] %s\n", port.Number(), port.String())
 }
 
-func printInPorts(ports []connect.In) {
+func printInPorts(ports []mid.In) {
 	fmt.Printf("MIDI IN Ports\n")
 	for _, port := range ports {
 		printPort(port)
@@ -108,7 +107,7 @@ func printInPorts(ports []connect.In) {
 	fmt.Printf("\n\n")
 }
 
-func printOutPorts(ports []connect.Out) {
+func printOutPorts(ports []mid.Out) {
 	fmt.Printf("MIDI OUT Ports\n")
 	for _, port := range ports {
 		printPort(port)

@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/gomidi/connect"
-	"github.com/gomidi/rtmididrv/imported/rtmidi"
+	"gitlab.com/gomidi/midi/mid"
+	"gitlab.com/gomidi/rtmididrv/imported/rtmidi"
 	//	"github.com/metakeule/mutex"
 )
 
 type driver struct {
 	debug  bool
-	opened []connect.Port
+	opened []mid.Port
 	sync.RWMutex
 	//	mutex.RWMutex
 	closed bool
@@ -27,7 +27,7 @@ func (d *driver) Close() (err error) {
 	d.RLock()
 	if d.closed {
 		d.RUnlock()
-		return connect.ErrClosed
+		return mid.ErrClosed
 	}
 
 	d.RUnlock()
@@ -57,7 +57,7 @@ func (d *driver) Close() (err error) {
 
 // New returns a driver based on the default rtmidi in and out
 //func New(debug bool) (connect.Driver, error) {
-func New() (connect.Driver, error) {
+func New() (mid.Driver, error) {
 	//d := &driver{debug: debug}
 	d := &driver{}
 	//	d.RWMutex = mutex.NewRWMutex("rtmididrv driver", debug)
@@ -65,12 +65,12 @@ func New() (connect.Driver, error) {
 }
 
 // Ins returns the available MIDI input ports
-func (d *driver) Ins() (ins []connect.In, err error) {
+func (d *driver) Ins() (ins []mid.In, err error) {
 	d.Lock()
 	defer d.Unlock()
 
 	if d.closed {
-		return nil, connect.ErrClosed
+		return nil, mid.ErrClosed
 	}
 	in, err := rtmidi.NewMIDIInDefault()
 	if err != nil {
@@ -95,12 +95,12 @@ func (d *driver) Ins() (ins []connect.In, err error) {
 }
 
 // Outs returns the available MIDI output ports
-func (d *driver) Outs() (outs []connect.Out, err error) {
+func (d *driver) Outs() (outs []mid.Out, err error) {
 	d.Lock()
 	defer d.Unlock()
 
 	if d.closed {
-		return nil, connect.ErrClosed
+		return nil, mid.ErrClosed
 	}
 	out, err := rtmidi.NewMIDIOutDefault()
 	if err != nil {

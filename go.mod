@@ -1,9 +1,8 @@
-module github.com/gomidi/rtmididrv
+module gitlab.com/gomidi/rtmididrv
 
-replace github.com/gomidi/rtmididrv/imported/rtmidi => ./imported/rtmidi
+replace gitlab.com/gomidi/rtmididrv/imported/rtmidi => ./imported/rtmidi
 
 require (
-	github.com/gomidi/connect v0.11.1
-	github.com/gomidi/rtmididrv/imported/rtmidi v0.0.0-20181003214813-394e08a8a616
-	github.com/metakeule/mutex v0.0.1
+	gitlab.com/gomidi/midi v1.7.4
+	gitlab.com/gomidi/rtmididrv/imported/rtmidi v0.0.0-20181023173540-4751d32e0b95
 )

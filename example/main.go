@@ -5,9 +5,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/gomidi/connect"
-	"github.com/gomidi/mid"
-	"github.com/gomidi/rtmididrv"
+	"gitlab.com/gomidi/midi/mid"
+	"gitlab.com/gomidi/rtmididrv"
 )
 
 func must(err error) {
@@ -66,11 +65,11 @@ func main() {
 	}
 }
 
-func printPort(port connect.Port) {
+func printPort(port mid.Port) {
 	fmt.Printf("[%v] %s\n", port.Number(), port.String())
 }
 
-func printInPorts(ports []connect.In) {
+func printInPorts(ports []mid.In) {
 	fmt.Printf("MIDI IN Ports\n")
 	for _, port := range ports {
 		printPort(port)
@@ -78,7 +77,7 @@ func printInPorts(ports []connect.In) {
 	fmt.Printf("\n\n")
 }
 
-func printOutPorts(ports []connect.Out) {
+func printOutPorts(ports []mid.Out) {
 	fmt.Printf("MIDI OUT Ports\n")
 	for _, port := range ports {
 		printPort(port)
