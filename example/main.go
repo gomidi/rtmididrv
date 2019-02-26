@@ -42,10 +42,10 @@ func main() {
 	must(in.Open())
 	must(out.Open())
 
-	wr := mid.WriteTo(out)
+	wr := mid.ConnectOut(out)
 
 	// listen for MIDI
-	go mid.NewReader().ReadFrom(in)
+	go mid.ConnectIn(in, mid.NewReader())
 
 	{ // write MIDI to out that passes it to in on which we listen.
 		err := wr.NoteOn(60, 100)
