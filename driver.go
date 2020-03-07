@@ -90,7 +90,7 @@ func (d *driver) Ins() (ins []mid.In, err error) {
 		ins = append(ins, newIn(d.debug, d, i, name))
 	}
 
-	//in.Destroy()
+	in.Close()
 	return
 }
 
@@ -119,6 +119,6 @@ func (d *driver) Outs() (outs []mid.Out, err error) {
 		}
 		outs = append(outs, newOut(d.debug, d, i, name))
 	}
-	//out.Destroy()
+	out.Close()
 	return
 }
