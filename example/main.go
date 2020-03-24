@@ -6,7 +6,9 @@ import (
 	"time"
 
 	"gitlab.com/gomidi/midi/mid"
-	"gitlab.com/gomidi/rtmididrv"
+	driver "gitlab.com/gomidi/rtmididrv"
+	// when using portmidi, replace the line above with
+	// driver gitlab.com/gomidi/portmididrv
 )
 
 func must(err error) {
@@ -19,7 +21,7 @@ func must(err error) {
 // somehow (are either virtual MIDI through ports or physically connected).
 // We write to the out port and listen to the in port.
 func main() {
-	drv, err := rtmididrv.New()
+	drv, err := driver.New()
 	must(err)
 
 	// make sure to close all open ports at the end
