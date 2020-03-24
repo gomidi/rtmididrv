@@ -7,7 +7,6 @@ import (
 
 	"gitlab.com/gomidi/midi/mid"
 	"gitlab.com/gomidi/rtmididrv/imported/rtmidi"
-	//	"github.com/metakeule/mutex"
 )
 
 type in struct {
@@ -16,7 +15,6 @@ type in struct {
 	name   string
 	midiIn rtmidi.MIDIIn
 	sync.RWMutex
-	//	mutex.RWMutex
 	listenerSet bool
 	closed      bool
 }
@@ -106,7 +104,6 @@ func (i *in) Open() (err error) {
 
 func newIn(debug bool, driver *driver, number int, name string) mid.In {
 	i := &in{driver: driver, number: number, name: name}
-	//	i.RWMutex = mutex.NewRWMutex("rtmididrv in port "+name, debug)
 	return i
 }
 

@@ -6,14 +6,12 @@ import (
 
 	"gitlab.com/gomidi/midi/mid"
 	"gitlab.com/gomidi/rtmididrv/imported/rtmidi"
-	//	"github.com/metakeule/mutex"
 )
 
 type driver struct {
 	debug  bool
 	opened []mid.Port
 	sync.RWMutex
-	//	mutex.RWMutex
 	closed bool
 }
 
@@ -91,6 +89,9 @@ func (d *driver) Ins() (ins []mid.In, err error) {
 	}
 
 	in.Close()
+
+	// don't destroy, destroy just panics
+	// in.Destroy()
 	return
 }
 
@@ -120,5 +121,8 @@ func (d *driver) Outs() (outs []mid.Out, err error) {
 		outs = append(outs, newOut(d.debug, d, i, name))
 	}
 	out.Close()
+
+	// don't destroy, destroy just panics
+	// out.Destroy()
 	return
 }

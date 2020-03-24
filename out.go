@@ -7,12 +7,10 @@ import (
 
 	"gitlab.com/gomidi/midi/mid"
 	"gitlab.com/gomidi/rtmididrv/imported/rtmidi"
-	//	"github.com/metakeule/mutex"
 )
 
 func newOut(debug bool, driver *driver, number int, name string) mid.Out {
 	o := &out{driver: driver, number: number, name: name}
-	//	o.RWMutex = mutex.NewRWMutex("rtmididrv out port "+name, debug)
 	return o
 }
 
@@ -22,7 +20,6 @@ type out struct {
 	number  int
 	name    string
 	sync.RWMutex
-	//	mutex.RWMutex
 	closed bool
 }
 
