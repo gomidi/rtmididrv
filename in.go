@@ -13,7 +13,7 @@ type in struct {
 	number int
 	sync.RWMutex
 	listenerSet bool
-	driver      *driver
+	driver      *Driver
 	name        string
 	midiIn      rtmidi.MIDIIn
 }
@@ -88,7 +88,7 @@ func (i *in) Open() (err error) {
 	return nil
 }
 
-func newIn(driver *driver, number int, name string) mid.In {
+func newIn(driver *Driver, number int, name string) mid.In {
 	return &in{driver: driver, number: number, name: name}
 }
 

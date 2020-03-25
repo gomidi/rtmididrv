@@ -9,17 +9,17 @@ import (
 	"gitlab.com/gomidi/rtmididrv/imported/rtmidi"
 )
 
-type driver struct {
+type Driver struct {
 	opened []mid.Port
 	sync.RWMutex
 }
 
-func (d *driver) String() string {
+func (d *Driver) String() string {
 	return "rtmididrv"
 }
 
 // Close closes all open ports. It must be called at the end of a session.
-func (d *driver) Close() (err error) {
+func (d *Driver) Close() (err error) {
 	d.Lock()
 	var e CloseErrors
 
@@ -40,12 +40,52 @@ func (d *driver) Close() (err error) {
 }
 
 // New returns a driver based on the default rtmidi in and out
-func New() (mid.Driver, error) {
-	return &driver{}, nil
+func New() (*Driver, error) {
+	return &Driver{}, nil
+}
+
+// OpenVirtualIn opens and returns a virtual MIDI in. We can't get the port number, so set it to -1.
+func (d *Driver) OpenVirtualIn(name string) (mid.In, error) {
+	_in, err := rtmidi.NewMIDIInDefault()
+	if err != nil {
+		return nil, fmt.Errorf("can't open default MIDI in: %v", err)
+	}
+
+	err = _in.OpenVirtualPort(name)
+
+	if err != nil {
+		return nil, fmt.Errorf("can't open virtual in port: %s", err.Error())
+	}
+
+	d.Lock()
+	defer d.Unlock()
+	inPort := &in{driver: d, number: -1, name: name, midiIn: _in}
+	d.opened = append(d.opened, inPort)
+	return inPort, nil
+}
+
+// OpenVirtualOut opens and returns a virtual MIDI out. We can't get the port number, so set it to -1.
+func (d *Driver) OpenVirtualOut(name string) (mid.Out, error) {
+	_out, err := rtmidi.NewMIDIOutDefault()
+	if err != nil {
+		return nil, fmt.Errorf("can't open default MIDI out: %v", err)
+	}
+
+	err = _out.OpenVirtualPort(name)
+
+	if err != nil {
+		return nil, fmt.Errorf("can't open virtual out port: %s", err.Error())
+	}
+
+	d.Lock()
+	defer d.Unlock()
+	outPort := &out{driver: d, number: -1, name: name, midiOut: _out}
+	d.opened = append(d.opened, outPort)
+	return outPort, nil
 }
 
 // Ins returns the available MIDI input ports
-func (d *driver) Ins() (ins []mid.In, err error) {
+func (d *Driver) Ins() (ins []mid.In, err error) {
 	var in rtmidi.MIDIIn
 	in, err = rtmidi.NewMIDIInDefault()
 	if err != nil {
@@ -72,7 +112,7 @@ func (d *driver) Ins() (ins []mid.In, err error) {
 }
 
 // Outs returns the available MIDI output ports
-func (d *driver) Outs() (outs []mid.Out, err error) {
+func (d *Driver) Outs() (outs []mid.Out, err error) {
 	var out rtmidi.MIDIOut
 	out, err = rtmidi.NewMIDIOutDefault()
 	if err != nil {
@@ -96,6 +136,7 @@ func (d *driver) Outs() (outs []mid.Out, err error) {
 	return
 }
 
+// CloseErrors collects error from closing multiple MIDI ports
 type CloseErrors []error
 
 func (c CloseErrors) Error() string {

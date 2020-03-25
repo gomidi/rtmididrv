@@ -8,7 +8,7 @@ import (
 	"gitlab.com/gomidi/rtmididrv/imported/rtmidi"
 )
 
-func newOut(driver *driver, number int, name string) mid.Out {
+func newOut(driver *Driver, number int, name string) mid.Out {
 	o := &out{driver: driver, number: number, name: name}
 	return o
 }
@@ -16,7 +16,7 @@ func newOut(driver *driver, number int, name string) mid.Out {
 type out struct {
 	number int
 	sync.RWMutex
-	driver  *driver
+	driver  *Driver
 	name    string
 	midiOut rtmidi.MIDIOut
 }
