@@ -81,6 +81,8 @@ func (i *in) Open() (err error) {
 		return fmt.Errorf("can't open MIDI in port %v (%s): %v", i.number, i, err)
 	}
 
+	i.midiIn.IgnoreTypes(false, false, false)
+
 	i.driver.Lock()
 	i.driver.opened = append(i.driver.opened, i)
 	i.driver.Unlock()

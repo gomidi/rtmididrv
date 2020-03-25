@@ -59,6 +59,7 @@ func (d *Driver) OpenVirtualIn(name string) (mid.In, error) {
 
 	d.Lock()
 	defer d.Unlock()
+	_in.IgnoreTypes(false, false, false)
 	inPort := &in{driver: d, number: -1, name: name, midiIn: _in}
 	d.opened = append(d.opened, inPort)
 	return inPort, nil
