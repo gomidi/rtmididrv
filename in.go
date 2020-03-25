@@ -10,19 +10,18 @@ import (
 )
 
 type in struct {
-	driver *driver
 	number int
-	name   string
-	midiIn rtmidi.MIDIIn
 	sync.RWMutex
 	listenerSet bool
-	closed      bool
+	driver      *driver
+	name        string
+	midiIn      rtmidi.MIDIIn
 }
 
 // IsOpen returns wether the MIDI in port is open
 func (i *in) IsOpen() (open bool) {
 	i.RLock()
-	open = !i.closed && i.midiIn != nil
+	open = i.midiIn != nil
 	i.RUnlock()
 	return
 }
@@ -46,52 +45,39 @@ func (i *in) Number() int {
 }
 
 // Close closes the MIDI in port, after it has stopped listening.
-func (i *in) Close() error {
-	i.RLock()
-	if i.closed || i.midiIn == nil {
-		i.RUnlock()
+func (i *in) Close() (err error) {
+	if !i.IsOpen() {
 		return nil
 	}
-	i.RUnlock()
 
+	i.StopListening()
 	i.Lock()
-	i.closed = true
-	i.stopListening()
+	err = i.midiIn.Close()
+	i.midiIn = nil
 	i.Unlock()
-
-	//time.Sleep(time.Millisecond * 500)
-	//i.Lock()
-	err := i.midiIn.Close()
-	//i.Unlock()
-	if err != nil {
-		return fmt.Errorf("can't close MIDI in port %v (%s): %v", i.number, i, err)
-	}
-
-	return nil
+	return
 }
 
 // Open opens the MIDI in port
 func (i *in) Open() (err error) {
-	i.RLock()
-	if i.closed || i.midiIn != nil {
-		i.RUnlock()
+	if i.IsOpen() {
 		return nil
 	}
-	i.RUnlock()
 
 	i.Lock()
-	defer i.Unlock()
 
 	i.midiIn, err = rtmidi.NewMIDIInDefault()
 	if err != nil {
 		i.midiIn = nil
+		i.Unlock()
 		return fmt.Errorf("can't open default MIDI in: %v", err)
 	}
 
 	err = i.midiIn.OpenPort(i.number, "")
+	i.Unlock()
+
 	if err != nil {
-		//i.midiIn.Destroy()
-		i.midiIn = nil
+		i.Close()
 		return fmt.Errorf("can't open MIDI in port %v (%s): %v", i.number, i, err)
 	}
 
@@ -102,22 +88,20 @@ func (i *in) Open() (err error) {
 	return nil
 }
 
-func newIn(debug bool, driver *driver, number int, name string) mid.In {
-	i := &in{driver: driver, number: number, name: name}
-	return i
+func newIn(driver *driver, number int, name string) mid.In {
+	return &in{driver: driver, number: number, name: name}
 }
 
 // SetListener makes the listener listen to the in port
 func (i *in) SetListener(listener func(data []byte, deltaMicroseconds int64)) (err error) {
-	i.RLock()
-	if i.closed || i.midiIn == nil {
-		i.RUnlock()
+	if !i.IsOpen() {
 		return mid.ErrClosed
 	}
 
+	i.RLock()
 	if i.listenerSet {
 		i.RUnlock()
-		return fmt.Errorf("listener allread set")
+		return fmt.Errorf("listener already set")
 	}
 	i.RUnlock()
 	i.Lock()
@@ -140,23 +124,18 @@ func (i *in) SetListener(listener func(data []byte, deltaMicroseconds int64)) (e
 }
 
 // StopListening cancels the listening
-func (i *in) StopListening() error {
-	i.RLock()
-	if i.closed || i.midiIn == nil {
-		i.RUnlock()
+func (i *in) StopListening() (err error) {
+	if !i.IsOpen() {
 		return mid.ErrClosed
 	}
-	i.RUnlock()
 	i.Lock()
-	err := i.stopListening()
-	i.Unlock()
-	return err
-}
-
-func (i *in) stopListening() error {
-	err := i.midiIn.CancelCallback()
-	if err != nil {
-		fmt.Errorf("can't stop listening on MIDI in port %v (%s): %v", i.number, i, err)
+	if i.listenerSet {
+		i.listenerSet = false
+		err = i.midiIn.CancelCallback()
+		if err != nil {
+			err = fmt.Errorf("can't stop listening on MIDI in port %v (%s): %v", i.number, i, err)
+		}
 	}
-	return nil
+	i.Unlock()
+	return
 }
