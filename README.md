@@ -4,7 +4,7 @@ If you are viewing this on Github, please note that the development has been mov
 
 ## Purpose
 
-A driver for the unified MIDI driver interface https://gitlab.com/gomidi/midi/mid.Driver .
+A driver for the unified MIDI driver interface https://gitlab.com/gomidi/midi.Driver .
 
 This driver is based on the rtmidi project (see https://github.com/thestk/rtmidi for more information).
 
