@@ -1,10 +1,13 @@
 # rtmididrv
 
+If you are viewing this on Github, please note that the development has been moved to Gitlab: gitlab.com/gomidi/rtmididrv
+
 ## Purpose
 
 A driver for the unified MIDI driver interface https://gitlab.com/gomidi/midi/mid.Driver .
 
 This driver is based on the rtmidi project (see https://github.com/thestk/rtmidi for more information).
+
 For a driver based on portmidi, see https://gitlab.com/gomidi/portmididrv
 
 ## Installation
@@ -20,7 +23,7 @@ go get -d gitlab.com/gomidi/rtmididrv
 
 ## Documentation
 
-[![rtmididrv docs](http://godoc.org/gitlab.com/gomidi/rtmididrv?status.png)](http://godoc.org/gitlab.com/gomidi/rtmididrv)
+[Documentation](https://pkg.go.dev/gitlab.com/gomidi/rtmididrv)
 
 
 ## Example
