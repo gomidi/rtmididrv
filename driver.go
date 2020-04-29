@@ -5,12 +5,12 @@ import (
 	"strings"
 	"sync"
 
-	"gitlab.com/gomidi/midi/mid"
+	"gitlab.com/gomidi/midi"
 	"gitlab.com/gomidi/rtmididrv/imported/rtmidi"
 )
 
 type Driver struct {
-	opened []mid.Port
+	opened []midi.Port
 	sync.RWMutex
 }
 
@@ -45,7 +45,7 @@ func New() (*Driver, error) {
 }
 
 // OpenVirtualIn opens and returns a virtual MIDI in. We can't get the port number, so set it to -1.
-func (d *Driver) OpenVirtualIn(name string) (mid.In, error) {
+func (d *Driver) OpenVirtualIn(name string) (midi.In, error) {
 	_in, err := rtmidi.NewMIDIInDefault()
 	if err != nil {
 		return nil, fmt.Errorf("can't open default MIDI in: %v", err)
@@ -66,7 +66,7 @@ func (d *Driver) OpenVirtualIn(name string) (mid.In, error) {
 }
 
 // OpenVirtualOut opens and returns a virtual MIDI out. We can't get the port number, so set it to -1.
-func (d *Driver) OpenVirtualOut(name string) (mid.Out, error) {
+func (d *Driver) OpenVirtualOut(name string) (midi.Out, error) {
 	_out, err := rtmidi.NewMIDIOutDefault()
 	if err != nil {
 		return nil, fmt.Errorf("can't open default MIDI out: %v", err)
@@ -86,7 +86,7 @@ func (d *Driver) OpenVirtualOut(name string) (mid.Out, error) {
 }
 
 // Ins returns the available MIDI input ports
-func (d *Driver) Ins() (ins []mid.In, err error) {
+func (d *Driver) Ins() (ins []midi.In, err error) {
 	var in rtmidi.MIDIIn
 	in, err = rtmidi.NewMIDIInDefault()
 	if err != nil {
@@ -113,7 +113,7 @@ func (d *Driver) Ins() (ins []mid.In, err error) {
 }
 
 // Outs returns the available MIDI output ports
-func (d *Driver) Outs() (outs []mid.Out, err error) {
+func (d *Driver) Outs() (outs []midi.Out, err error) {
 	var out rtmidi.MIDIOut
 	out, err = rtmidi.NewMIDIOutDefault()
 	if err != nil {

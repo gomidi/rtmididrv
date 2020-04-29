@@ -36,12 +36,12 @@ func main() {
 		return
 	}
 
-	var in mid.In
+	var in midi.In
 	in, err = drv.OpenVirtualIn("test-virtual-in")
 
 	must(err)
 
-	var out mid.Out
+	var out midi.Out
 	out, err = drv.OpenVirtualOut("test-virtual-out")
 
 	must(err)
@@ -59,11 +59,11 @@ func main() {
 	<-c
 }
 
-func printPort(port mid.Port) {
+func printPort(port midi.Port) {
 	fmt.Printf("[%v] %s\n", port.Number(), port.String())
 }
 
-func printInPorts(ports []mid.In) {
+func printInPorts(ports []midi.In) {
 	fmt.Printf("MIDI IN Ports\n")
 	for _, port := range ports {
 		printPort(port)
@@ -71,7 +71,7 @@ func printInPorts(ports []mid.In) {
 	fmt.Printf("\n\n")
 }
 
-func printOutPorts(ports []mid.Out) {
+func printOutPorts(ports []midi.Out) {
 	fmt.Printf("MIDI OUT Ports\n")
 	for _, port := range ports {
 		printPort(port)

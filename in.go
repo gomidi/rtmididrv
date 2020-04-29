@@ -5,7 +5,7 @@ import (
 	"math"
 	"sync"
 
-	"gitlab.com/gomidi/midi/mid"
+	"gitlab.com/gomidi/midi"
 	"gitlab.com/gomidi/rtmididrv/imported/rtmidi"
 )
 
@@ -90,14 +90,14 @@ func (i *in) Open() (err error) {
 	return nil
 }
 
-func newIn(driver *Driver, number int, name string) mid.In {
+func newIn(driver *Driver, number int, name string) midi.In {
 	return &in{driver: driver, number: number, name: name}
 }
 
 // SetListener makes the listener listen to the in port
 func (i *in) SetListener(listener func(data []byte, deltaMicroseconds int64)) (err error) {
 	if !i.IsOpen() {
-		return mid.ErrClosed
+		return midi.ErrPortClosed
 	}
 
 	i.RLock()
@@ -128,7 +128,7 @@ func (i *in) SetListener(listener func(data []byte, deltaMicroseconds int64)) (e
 // StopListening cancels the listening
 func (i *in) StopListening() (err error) {
 	if !i.IsOpen() {
-		return mid.ErrClosed
+		return midi.ErrPortClosed
 	}
 	i.Lock()
 	if i.listenerSet {

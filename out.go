@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"sync"
 
-	"gitlab.com/gomidi/midi/mid"
+	"gitlab.com/gomidi/midi"
 	"gitlab.com/gomidi/rtmididrv/imported/rtmidi"
 )
 
-func newOut(driver *Driver, number int, name string) mid.Out {
+func newOut(driver *Driver, number int, name string) midi.Out {
 	o := &out{driver: driver, number: number, name: name}
 	return o
 }
@@ -37,7 +37,7 @@ func (o *out) Send(b []byte) error {
 	defer o.Unlock()
 	if o.midiOut == nil {
 		//o.RUnlock()
-		return mid.ErrClosed
+		return midi.ErrPortClosed
 	}
 	//	o.RUnlock()
 

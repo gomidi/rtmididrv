@@ -13,10 +13,10 @@ import (
 
 var (
 	portsMx sync.Mutex
-	drv     mid.Driver
+	drv     midi.Driver
 
-	inPorts  = map[int]mid.In{}
-	outPorts = map[int]mid.Out{}
+	inPorts  = map[int]midi.In{}
+	outPorts = map[int]midi.Out{}
 )
 
 func init() {
@@ -44,7 +44,7 @@ func main() {
 	<-ww
 }
 
-func greet(out mid.Out) {
+func greet(out midi.Out) {
 	out.Open()
 	wr := mid.ConnectOut(out)
 	time.Sleep(time.Millisecond * 200)
@@ -59,7 +59,7 @@ func greet(out mid.Out) {
 	time.Sleep(time.Second * 1)
 }
 
-func listen(in mid.In) {
+func listen(in midi.In) {
 	in.Open()
 	rd := mid.NewReader(mid.NoLogger())
 	rd.Msg.Each = func(_ *mid.Position, msg midi.Message) {
