@@ -2,6 +2,10 @@
 
 If you are viewing this on Github, please note that the development has been moved to Gitlab: gitlab.com/gomidi/rtmididrv
 
+## Notice - Moved
+
+ Development has moved to GitLab https://gitlab.com/gomidi. It is recommended to use the code there instead, as the repos at Gitlab contains newer fixes, and some import references contained in the github repo may be broken
+
 ## Purpose
 
 A driver for the unified MIDI driver interface https://gitlab.com/gomidi/midi/mid.Driver .
