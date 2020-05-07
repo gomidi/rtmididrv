@@ -6,7 +6,8 @@ import (
 	"time"
 
 	"gitlab.com/gomidi/midi"
-	"gitlab.com/gomidi/midi/mid"
+	"gitlab.com/gomidi/midi/reader"
+	"gitlab.com/gomidi/midi/writer"
 	driver "gitlab.com/gomidi/rtmididrv"
 	// when using portmidi, replace the line above with
 	// driver gitlab.com/gomidi/portmididrv
@@ -45,25 +46,26 @@ func main() {
 	must(in.Open())
 	must(out.Open())
 
-	wr := mid.ConnectOut(out)
+	wr := writer.New(out)
 
 	// listen for MIDI
-	go mid.ConnectIn(in, mid.NewReader())
+	rd := reader.New(nil)
+	go rd.ListenTo(in)
 
 	{ // write MIDI to out that passes it to in on which we listen.
-		err := wr.NoteOn(60, 100)
+		err := writer.NoteOn(wr, 60, 100)
 		if err != nil {
 			panic(err)
 		}
 		time.Sleep(time.Nanosecond)
-		wr.NoteOff(60)
+		writer.NoteOff(wr, 60)
 		time.Sleep(time.Nanosecond)
 
 		wr.SetChannel(1)
 
-		wr.NoteOn(70, 100)
+		writer.NoteOn(wr, 70, 100)
 		time.Sleep(time.Nanosecond)
-		wr.NoteOff(70)
+		writer.NoteOff(wr, 70)
 		time.Sleep(time.Second * 1)
 	}
 }

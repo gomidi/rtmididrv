@@ -5,7 +5,8 @@ import (
 	"os"
 
 	"gitlab.com/gomidi/midi"
-	"gitlab.com/gomidi/midi/mid"
+	"gitlab.com/gomidi/midi/reader"
+	"gitlab.com/gomidi/midi/writer"
 	"gitlab.com/gomidi/rtmididrv"
 )
 
@@ -46,16 +47,17 @@ func main() {
 
 	must(err)
 
-	wr := mid.ConnectOut(out)
+	wr := writer.New(out)
 
 	// listen for MIDI
-	rd := mid.NewReader()
+	rd := reader.New(
+		reader.Each(func(_ *reader.Position, msg midi.Message) {
+			wr.Write(msg)
+		}),
+	)
 	// example to write received messages from the virtual in port to the virtual out port
-	rd.Msg.Each = func(_ *mid.Position, msg midi.Message) {
-		wr.Write(msg)
-	}
 	c := make(chan int, 10)
-	go mid.ConnectIn(in, rd)
+	go rd.ListenTo(in)
 	<-c
 }
 

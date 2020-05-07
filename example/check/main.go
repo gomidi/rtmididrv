@@ -7,7 +7,8 @@ import (
 	"time"
 
 	"gitlab.com/gomidi/midi"
-	"gitlab.com/gomidi/midi/mid"
+	"gitlab.com/gomidi/midi/reader"
+	"gitlab.com/gomidi/midi/writer"
 	driver "gitlab.com/gomidi/rtmididrv"
 )
 
@@ -46,26 +47,27 @@ func main() {
 
 func greet(out midi.Out) {
 	out.Open()
-	wr := mid.ConnectOut(out)
+	wr := writer.New(out)
 	time.Sleep(time.Millisecond * 200)
-	wr.NoteOn(60, 100)
+	writer.NoteOn(wr, 60, 100)
 	time.Sleep(time.Nanosecond)
-	wr.NoteOff(60)
+	writer.NoteOff(wr, 60)
 	time.Sleep(time.Nanosecond)
 	wr.SetChannel(1)
-	wr.NoteOn(70, 100)
+	writer.NoteOn(wr, 70, 100)
 	time.Sleep(time.Nanosecond)
-	wr.NoteOff(70)
+	writer.NoteOff(wr, 70)
 	time.Sleep(time.Second * 1)
 }
 
 func listen(in midi.In) {
 	in.Open()
-	rd := mid.NewReader(mid.NoLogger())
-	rd.Msg.Each = func(_ *mid.Position, msg midi.Message) {
-		fmt.Printf("got message %s from in port %s\n", msg.String(), in.String())
-	}
-	mid.ConnectIn(in, rd)
+	rd := reader.New(reader.NoLogger(),
+		reader.Each(func(_ *reader.Position, msg midi.Message) {
+			fmt.Printf("got message %s from in port %s\n", msg.String(), in.String())
+		}),
+	)
+	rd.ListenTo(in)
 }
 
 func checkPorts() {

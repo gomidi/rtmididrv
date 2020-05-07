@@ -29,23 +29,23 @@ func (o *out) IsOpen() (open bool) {
 	return
 }
 
-// Send sends a message to the MIDI out port
-// If the out port is closed, it returns mid.ErrClosed
-func (o *out) Send(b []byte) error {
+// Write writes a MIDI message to the MIDI output port
+// If the output port is closed, it returns midi.ErrClosed
+func (o *out) Write(b []byte) (int, error) {
 	//o.RLock()
 	o.Lock()
 	defer o.Unlock()
 	if o.midiOut == nil {
 		//o.RUnlock()
-		return midi.ErrPortClosed
+		return 0, midi.ErrPortClosed
 	}
 	//	o.RUnlock()
 
 	err := o.midiOut.SendMessage(b)
 	if err != nil {
-		return fmt.Errorf("could not send message to MIDI out %v (%s): %v", o.number, o, err)
+		return 0, fmt.Errorf("could not send message to MIDI out %v (%s): %v", o.number, o, err)
 	}
-	return nil
+	return len(b), nil
 }
 
 // Underlying returns the underlying rtmidi.MIDIOut. Use it with type casting:
