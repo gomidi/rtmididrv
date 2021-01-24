@@ -3,34 +3,6 @@
 #include "rtmidi_c.h"
 #include "RtMidi.h"
 
-/* Compile-time assertions that will break if the enums are changed in
- * the future without synchronizing them properly.  If you get (g++)
- * "error: ‘StaticAssert<b>::StaticAssert() [with bool b = false]’ is
- * private within this context", it means enums are not aligned. */
-template<bool b> class StaticAssert { private: StaticAssert() {} };
-template<> class StaticAssert<true>{ public: StaticAssert() {} };
-#define ENUM_EQUAL(x,y) StaticAssert<(int)x==(int)y>()
-class StaticAssertions { StaticAssertions() {
-    ENUM_EQUAL( RTMIDI_API_UNSPECIFIED,     RtMidi::UNSPECIFIED );
-    ENUM_EQUAL( RTMIDI_API_MACOSX_CORE,     RtMidi::MACOSX_CORE );
-    ENUM_EQUAL( RTMIDI_API_LINUX_ALSA,      RtMidi::LINUX_ALSA );
-    ENUM_EQUAL( RTMIDI_API_UNIX_JACK,       RtMidi::UNIX_JACK );
-    ENUM_EQUAL( RTMIDI_API_WINDOWS_MM,      RtMidi::WINDOWS_MM );
-    ENUM_EQUAL( RTMIDI_API_RTMIDI_DUMMY,    RtMidi::RTMIDI_DUMMY );
-
-    ENUM_EQUAL( RTMIDI_ERROR_WARNING,            RtMidiError::WARNING );
-    ENUM_EQUAL( RTMIDI_ERROR_DEBUG_WARNING,      RtMidiError::DEBUG_WARNING );
-    ENUM_EQUAL( RTMIDI_ERROR_UNSPECIFIED,        RtMidiError::UNSPECIFIED );
-    ENUM_EQUAL( RTMIDI_ERROR_NO_DEVICES_FOUND,   RtMidiError::NO_DEVICES_FOUND );
-    ENUM_EQUAL( RTMIDI_ERROR_INVALID_DEVICE,     RtMidiError::INVALID_DEVICE );
-    ENUM_EQUAL( RTMIDI_ERROR_MEMORY_ERROR,       RtMidiError::MEMORY_ERROR );
-    ENUM_EQUAL( RTMIDI_ERROR_INVALID_PARAMETER,  RtMidiError::INVALID_PARAMETER );
-    ENUM_EQUAL( RTMIDI_ERROR_INVALID_USE,        RtMidiError::INVALID_USE );
-    ENUM_EQUAL( RTMIDI_ERROR_DRIVER_ERROR,       RtMidiError::DRIVER_ERROR );
-    ENUM_EQUAL( RTMIDI_ERROR_SYSTEM_ERROR,       RtMidiError::SYSTEM_ERROR );
-    ENUM_EQUAL( RTMIDI_ERROR_THREAD_ERROR,       RtMidiError::THREAD_ERROR );
-}};
-
 class CallbackProxyUserData
 {
   public:
@@ -42,7 +14,6 @@ class CallbackProxyUserData
 	void *user_data;
 };
 
-extern "C" const enum RtMidiApi rtmidi_compiled_apis[]; // casting from RtMidi::Api[]
 extern "C" const unsigned int rtmidi_num_compiled_apis;
 
 /* RtMidi API */
@@ -68,14 +39,6 @@ const char *rtmidi_api_display_name(enum RtMidiApi api)
     if (api < 0 || api >= RTMIDI_API_NUM)
         return "Unknown";
     return rtmidi_api_names[api][1];
-}
-
-enum RtMidiApi rtmidi_compiled_api_by_name(const char *name) {
-    RtMidi::Api api = RtMidi::UNSPECIFIED;
-    if (name) {
-        api = RtMidi::getCompiledApiByName(name);
-    }
-    return (enum RtMidiApi)api;
 }
 
 void rtmidi_error (MidiApi *api, enum RtMidiErrorType type, const char* errorString)
