@@ -11,24 +11,24 @@ template<bool b> class StaticAssert { private: StaticAssert() {} };
 template<> class StaticAssert<true>{ public: StaticAssert() {} };
 #define ENUM_EQUAL(x,y) StaticAssert<(int)x==(int)y>()
 class StaticAssertions { StaticAssertions() {
-    ENUM_EQUAL( RT_MIDI_API_UNSPECIFIED,     RtMidi::UNSPECIFIED );
-    ENUM_EQUAL( RT_MIDI_API_MACOSX_CORE,     RtMidi::MACOSX_CORE );
-    ENUM_EQUAL( RT_MIDI_API_LINUX_ALSA,      RtMidi::LINUX_ALSA );
-    ENUM_EQUAL( RT_MIDI_API_UNIX_JACK,       RtMidi::UNIX_JACK );
-    ENUM_EQUAL( RT_MIDI_API_WINDOWS_MM,      RtMidi::WINDOWS_MM );
-    ENUM_EQUAL( RT_MIDI_API_RTMIDI_DUMMY,    RtMidi::RTMIDI_DUMMY );
+    ENUM_EQUAL( RTMIDI_API_UNSPECIFIED,     RtMidi::UNSPECIFIED );
+    ENUM_EQUAL( RTMIDI_API_MACOSX_CORE,     RtMidi::MACOSX_CORE );
+    ENUM_EQUAL( RTMIDI_API_LINUX_ALSA,      RtMidi::LINUX_ALSA );
+    ENUM_EQUAL( RTMIDI_API_UNIX_JACK,       RtMidi::UNIX_JACK );
+    ENUM_EQUAL( RTMIDI_API_WINDOWS_MM,      RtMidi::WINDOWS_MM );
+    ENUM_EQUAL( RTMIDI_API_RTMIDI_DUMMY,    RtMidi::RTMIDI_DUMMY );
 
-    ENUM_EQUAL( RT_ERROR_WARNING,            RtMidiError::WARNING );
-    ENUM_EQUAL( RT_ERROR_DEBUG_WARNING,      RtMidiError::DEBUG_WARNING );
-    ENUM_EQUAL( RT_ERROR_UNSPECIFIED,        RtMidiError::UNSPECIFIED );
-    ENUM_EQUAL( RT_ERROR_NO_DEVICES_FOUND,   RtMidiError::NO_DEVICES_FOUND );
-    ENUM_EQUAL( RT_ERROR_INVALID_DEVICE,     RtMidiError::INVALID_DEVICE );
-    ENUM_EQUAL( RT_ERROR_MEMORY_ERROR,       RtMidiError::MEMORY_ERROR );
-    ENUM_EQUAL( RT_ERROR_INVALID_PARAMETER,  RtMidiError::INVALID_PARAMETER );
-    ENUM_EQUAL( RT_ERROR_INVALID_USE,        RtMidiError::INVALID_USE );
-    ENUM_EQUAL( RT_ERROR_DRIVER_ERROR,       RtMidiError::DRIVER_ERROR );
-    ENUM_EQUAL( RT_ERROR_SYSTEM_ERROR,       RtMidiError::SYSTEM_ERROR );
-    ENUM_EQUAL( RT_ERROR_THREAD_ERROR,       RtMidiError::THREAD_ERROR );
+    ENUM_EQUAL( RTMIDI_ERROR_WARNING,            RtMidiError::WARNING );
+    ENUM_EQUAL( RTMIDI_ERROR_DEBUG_WARNING,      RtMidiError::DEBUG_WARNING );
+    ENUM_EQUAL( RTMIDI_ERROR_UNSPECIFIED,        RtMidiError::UNSPECIFIED );
+    ENUM_EQUAL( RTMIDI_ERROR_NO_DEVICES_FOUND,   RtMidiError::NO_DEVICES_FOUND );
+    ENUM_EQUAL( RTMIDI_ERROR_INVALID_DEVICE,     RtMidiError::INVALID_DEVICE );
+    ENUM_EQUAL( RTMIDI_ERROR_MEMORY_ERROR,       RtMidiError::MEMORY_ERROR );
+    ENUM_EQUAL( RTMIDI_ERROR_INVALID_PARAMETER,  RtMidiError::INVALID_PARAMETER );
+    ENUM_EQUAL( RTMIDI_ERROR_INVALID_USE,        RtMidiError::INVALID_USE );
+    ENUM_EQUAL( RTMIDI_ERROR_DRIVER_ERROR,       RtMidiError::DRIVER_ERROR );
+    ENUM_EQUAL( RTMIDI_ERROR_SYSTEM_ERROR,       RtMidiError::SYSTEM_ERROR );
+    ENUM_EQUAL( RTMIDI_ERROR_THREAD_ERROR,       RtMidiError::THREAD_ERROR );
 }};
 
 class CallbackProxyUserData
@@ -42,23 +42,40 @@ class CallbackProxyUserData
 	void *user_data;
 };
 
+extern "C" const enum RtMidiApi rtmidi_compiled_apis[]; // casting from RtMidi::Api[]
+extern "C" const unsigned int rtmidi_num_compiled_apis;
+
 /* RtMidi API */
 int rtmidi_get_compiled_api (enum RtMidiApi *apis, unsigned int apis_size)
 {
-    std::vector<RtMidi::Api> v;
-    try {
-        RtMidi::getCompiledApi(v);
-    } catch (...) {
-        return -1;
-    }
+    unsigned num = rtmidi_num_compiled_apis;
     if (apis) {
-        unsigned int i;
-        for (i = 0; i < v.size() && i < apis_size; i++)
-            apis[i] = (RtMidiApi) v[i];
-        return (int)i;
+        num = (num < apis_size) ? num : apis_size;
+        memcpy(apis, rtmidi_compiled_apis, num * sizeof(enum RtMidiApi));
     }
-    // return length for NULL argument.
-    return v.size();
+    return (int)num;
+}
+
+extern "C" const char* rtmidi_api_names[][2];
+const char *rtmidi_api_name(enum RtMidiApi api) {
+    if (api < 0 || api >= RTMIDI_API_NUM)
+        return NULL;
+    return rtmidi_api_names[api][0];
+}
+
+const char *rtmidi_api_display_name(enum RtMidiApi api)
+{
+    if (api < 0 || api >= RTMIDI_API_NUM)
+        return "Unknown";
+    return rtmidi_api_names[api][1];
+}
+
+enum RtMidiApi rtmidi_compiled_api_by_name(const char *name) {
+    RtMidi::Api api = RtMidi::UNSPECIFIED;
+    if (name) {
+        api = RtMidi::getCompiledApiByName(name);
+    }
+    return (enum RtMidiApi)api;
 }
 
 void rtmidi_error (MidiApi *api, enum RtMidiErrorType type, const char* errorString)
@@ -191,7 +208,7 @@ enum RtMidiApi rtmidi_in_get_current_api (RtMidiPtr device)
         device->ok  = false;
         device->msg = err.what ();
 
-        return RT_MIDI_API_UNSPECIFIED;
+        return RTMIDI_API_UNSPECIFIED;
     }
 }
 
@@ -322,7 +339,7 @@ enum RtMidiApi rtmidi_out_get_current_api (RtMidiPtr device)
         device->ok  = false;
         device->msg = err.what ();
 
-        return RT_MIDI_API_UNSPECIFIED;
+        return RTMIDI_API_UNSPECIFIED;
     }
 }
 
